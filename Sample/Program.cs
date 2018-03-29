@@ -66,27 +66,27 @@ class Program
         Console.WriteLine("Queues purged.");
 
         var concurrencyLevel = 4;
-        var cts = new CancellationTokenSource(TimeSpan.FromMinutes(2));
+        var testTimeout = TimeSpan.FromMinutes(2);
+        var cts = new CancellationTokenSource(testTimeout);
+        var consumerCts = new CancellationTokenSource(testTimeout.Add(TimeSpan.FromSeconds(40)));
         var syncher = new TaskCompletionSource<bool>();
 
         var consumerTasks = new List<Task>();
 
         for (var i = 0; i < concurrencyLevel; i++)
         {
-            consumerTasks.Add(ConsumeMessage(client, queueUrl, i, cts.Token));
+            consumerTasks.Add(ConsumeMessage(client, queueUrl, i, consumerCts.Token));
         }
-
 
         var sendTask = Task.Run(() => Sending(client, queueUrl, cts.Token, syncher), CancellationToken.None);
         var checkTask = Task.Run(() => DumpCurrentState(cts.Token), CancellationToken.None);
 
         await Task.WhenAll(consumerTasks.Union(new[]
         {
-            sendTask,
-            checkTask
+            sendTask, checkTask,
+            CheckState(syncher)
         }));
-
-        await CheckState(syncher);
+   
 
         client.Dispose();
 
