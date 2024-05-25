@@ -1,10 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AWSSDK.SQS" Version="3.*" />
+    <Reference Include="AWSSDK.Core">
+      <HintPath>..\sdk\AWSSDK.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="AWSSDK.SQS">
+      <HintPath>..\sdk\AWSSDK.SQS.dll</HintPath>
+    </Reference>
   </ItemGroup>
+<!--  <ItemGroup>-->
+<!--    <PackageReference Include="AWSSDK.SQS" Version="3.*" />-->
+<!--  </ItemGroup>-->
 </Project>

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Amazon;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 
@@ -38,6 +39,8 @@ class Program
 
     static async Task Main()
     {
+        AWSConfigs.InitializeCollections = true;
+
         Console.Title = EndpointName;
 
         Console.WriteLine("Purging queues");
@@ -59,11 +62,15 @@ class Program
             var inputQueue = await client.GetQueueUrlAsync(QueueName);
             await client.PurgeQueueAsync(inputQueue.QueueUrl);
         }
+        catch (PurgeQueueInProgressException)
+        {
+        }
         catch (QueueDoesNotExistException)
         {
         }
 
         Console.WriteLine("Queues purged.");
+        Console.ReadLine();
 
         var concurrencyLevel = 4;
         var testTimeout = TimeSpan.FromMinutes(2);
